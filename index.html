@@ -445,7 +445,7 @@
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div id="modal-settings" class="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div id="modal-settings" class="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this)toggleSettingsModal()">
       <div class="glass-bubble max-w-sm w-full p-6 space-y-6 border border-white shadow-2xl animate-float">
         <div class="flex justify-between items-center">
           <h3 class="font-bold text-lg text-slate-800" data-i18n="settings_title">Pengaturan</h3>
