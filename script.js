@@ -287,6 +287,7 @@ const L = {
   mbti_res: ['Hasil MBTI', 'MBTI Result', 'نتيجة MBTI', 'MBTI结果'],
   q_label: ['PERTANYAAN', 'QUESTION', 'السؤال', '问题'],
   q_progress: ['Pertanyaan {n} dari {t}', 'Question {n} of {t}', 'السؤال {n} من {t}', '第 {n} 题 / 共 {t} 题'],
+  q_hint: ['Ketuk bagian mana saja di gelembung pertanyaan untuk lompat atau kembali ke pertanyaan itu.', 'Tap anywhere on a question bubble to jump back or skip to that question.', 'اضغط على أي جزء من فقاعة السؤال للانتقال إليه أو الرجوع إليه.', '点击问题气泡的任意位置即可跳转或返回该题。'],
   agree: ['Setuju', 'Agree', 'أوافق', '同意'],
   disagree: ['Tidak Setuju', 'Disagree', 'لا أوافق', '不同意'],
   o3: ['Sangat Setuju', 'Strongly Agree', 'أوافق بشدة', '非常同意'],
@@ -386,8 +387,16 @@ document.addEventListener('DOMContentLoaded', () => {
   setupScrollAnimations(); initSession(); setLanguage(currentLang); initTypePage();
   const list = $('questions-list');
   if (list) {
-    list.addEventListener('mouseover', (e) => { const c = e.target.closest('.question-card'); const n = c ? +c.id.replace('question-card-', '') : null; clearTimeout(hoverTimer); hoverTimer = setTimeout(() => { hoverIdx = n; applyFocus(); }, 80); });
-    list.addEventListener('mouseleave', () => { clearTimeout(hoverTimer); hoverIdx = null; applyFocus(); });
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (canHover) list.addEventListener('mouseover', (e) => { const c = e.target.closest('.question-card'); const n = c ? +c.id.replace('question-card-', '') : null; clearTimeout(hoverTimer); hoverTimer = setTimeout(() => { hoverIdx = n; applyFocus(); }, 80); });
+    // Ketuk/klik area bubble (selain tombol jawaban) = pindah ke pertanyaan itu (lompat / kembali)
+    list.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const c = e.target.closest('.question-card'); if (!c) return;
+      hoverIdx = +c.id.replace('question-card-', ''); applyFocus();
+      c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    if (canHover) list.addEventListener('mouseleave', () => { clearTimeout(hoverTimer); hoverIdx = null; applyFocus(); });
   }
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTypeModal(); });
 });
