@@ -1,0 +1,67 @@
+/* ===== Halaman penuh detail tipe ===== */
+:root { --hdr: 64px; --green: #16a34a; --green2: #22c55e; }
+
+/* Hero */
+.tp-hero { color: #fff; padding: 28px 20px 34px; position: relative; overflow: hidden; }
+.tp-hero::after { content: ""; position: absolute; inset: auto -40px -60px auto; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.14); }
+.tp-hero-in { max-width: 48rem; margin: 0 auto; position: relative; z-index: 1; }
+.tp-back { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.92); background: rgba(255,255,255,.18); padding: 6px 14px; border-radius: 999px; margin-bottom: 18px; }
+.tp-back:hover { background: rgba(255,255,255,.3); }
+.tp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tp-chip { font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.22); }
+.tp-code { font-size: clamp(2.6rem, 9vw, 4rem); font-weight: 900; line-height: 1; letter-spacing: .02em; }
+.tp-title { font-size: 1.25rem; font-weight: 700; margin-top: 4px; }
+.tp-desc { margin-top: 10px; max-width: 34rem; font-size: 14px; line-height: 1.6; opacity: .95; }
+
+/* Tab 1-8 (sticky) */
+.tp-tabs-wrap { position: sticky; top: var(--hdr); z-index: 30; background: rgba(255,255,255,.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(226,232,240,.9); }
+.tp-tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; max-width: 64rem; margin: 0 auto; padding: 0 8px; }
+.tp-tabs::-webkit-scrollbar { display: none; }
+.tp-tab { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 14px 12px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; border: 0; background: none; }
+.tp-tab .n { width: 20px; height: 20px; border-radius: 50%; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; background: #e2e8f0; color: #64748b; transition: all .3s; }
+/* teks terisi hijau mengikuti scroll (--p = 0..100%) */
+.tp-tab .lbl { --p: 0%; color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(90deg, var(--green) var(--p), #64748b var(--p)); }
+.tp-tab.done .lbl { background-image: linear-gradient(90deg, var(--green), var(--green)); }
+.tp-tab.done .n, .tp-tab.active .n { background: var(--green); color: #fff; }
+.tp-tab.active .n { box-shadow: 0 0 0 4px rgba(34,197,94,.22); }
+.tp-bar { height: 3px; background: rgba(148,163,184,.25); }
+.tp-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--green2), var(--green)); transition: width .12s linear; }
+
+/* Isi artikel */
+.tp-article { font-size: 16px; line-height: 1.85; color: #334155; }
+.tp-article > * + * { margin-top: 1.1em; }
+.tp-article h3 { font-size: 1.35rem; font-weight: 800; color: #0f172a; line-height: 1.3; margin-top: 1.8em; }
+.tp-article .tp-q { border-inline-start: 4px solid var(--hex, #38b2ac); background: rgba(255,255,255,.7); padding: 14px 18px; border-radius: 0 16px 16px 0; font-style: italic; color: #1e293b; }
+html[dir="rtl"] .tp-article .tp-q { border-radius: 16px 0 0 16px; }
+.tp-article .tp-q cite { display: block; margin-top: 6px; font-style: normal; font-weight: 700; font-size: 13px; color: #64748b; }
+.tp-article ul { list-style: none; padding: 0; display: grid; gap: 12px; }
+.tp-article li { position: relative; padding: 14px 16px 14px 44px; background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.95); border-radius: 16px; box-shadow: 0 6px 18px rgba(31,38,135,.05); line-height: 1.7; }
+html[dir="rtl"] .tp-article li { padding: 14px 44px 14px 16px; }
+.tp-article li::before { content: ""; position: absolute; inset-inline-start: 16px; top: 22px; width: 12px; height: 12px; border-radius: 4px; background: var(--hex, #38b2ac); transform: rotate(45deg); }
+.tp-article li b { color: #0f172a; }
+.tp-empty { text-align: center; padding: 40px 20px; border-radius: 24px; background: rgba(255,255,255,.7); color: #64748b; font-size: 14px; }
+.tp-variants { display: grid; gap: 10px; margin-top: 2.2em; }
+.tp-variants > div { padding: 14px 16px; border-radius: 16px; background: rgba(241,245,249,.9); font-size: 14px; line-height: 1.6; }
+.tp-fade { animation: tpFade .45s ease both; }
+@keyframes tpFade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Prev / Next */
+.tp-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 40px; }
+.tp-pager button { text-align: start; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,.8); border: 1px solid rgba(226,232,240,.9); transition: all .2s; }
+.tp-pager button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(56,178,172,.18); }
+.tp-pager small { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+.tp-pager b { font-size: 15px; color: #0f172a; }
+.tp-pager .nx { text-align: end; grid-column: 2; }
+
+/* Tab bar bawah (HP) */
+.m-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px 8px; color: #64748b; transition: color .2s; }
+.m-tab i { font-size: 18px; }
+.m-tab.on { color: #0d9488; }
+.m-tab.on i { transform: translateY(-1px) scale(1.1); }
+@media (max-width: 767px) { .tp-tabs-wrap { top: var(--hdr); } }
+
+/* Hanya tab aktif yang hijau; tab lain tetap abu-abu */
+.tp-tab .lbl { transition: none; }
+.tp-tab:not(.active) .lbl { background-image: none; color: #64748b; -webkit-text-fill-color: #64748b; }
+.tp-tab:not(.active) .n { background: #e2e8f0; color: #64748b; box-shadow: none; }

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>16 Personalities</title>
+  <link rel="icon" type="image/png" href="favicon2.png">
+  <link rel="apple-touch-icon" href="favicon1.png">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts - Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+  <!-- QRCode.js untuk Generator QR Code otomatis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script src="tailwind-config.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="type-page.css">
+  <style>
+    .hero-bubble{position:absolute;border-radius:9999px;z-index:0;
+      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.95),rgba(186,230,253,.55) 45%,rgba(165,180,252,.35) 100%);
+      border:2px solid rgba(255,255,255,.85);
+      box-shadow:inset 0 0 22px rgba(255,255,255,.7),0 10px 30px rgba(99,102,241,.18);
+      backdrop-filter:blur(4px);animation:heroBubbleFloat 7s ease-in-out infinite}
+    @keyframes heroBubbleFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.04)}}
+    /* Area klik di atas gambar alltype.png (grid 4x4). Geser --tl/--tt/--tg kalau kotaknya kurang pas */
+    .hero-tiles{position:absolute;inset:0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);
+      padding:var(--tp,.8%);gap:var(--tg,2.6%);box-sizing:border-box}
+    .hero-tile{display:block;width:100%;height:100%;border:0;background:transparent;cursor:pointer;border-radius:4px;transition:transform .2s,box-shadow .2s,background .2s}
+    .hero-tile:hover,.hero-tile:focus-visible{transform:scale(1.05);background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(255,255,255,.95),0 10px 24px rgba(15,23,42,.3);outline:none}
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    .cm-overlay{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
+    .cm-overlay.hidden{display:none}
+    .cm-wrap{display:flex;align-items:flex-end;max-width:520px;width:100%;animation:cmPop .45s steps(6) both}
+    @keyframes cmPop{from{transform:translateY(40px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+    .cm-monster{width:150px;flex:none;margin-right:-26px;position:relative;z-index:2;image-rendering:pixelated;animation:cmBob 1.2s steps(2) infinite}
+    @keyframes cmBob{50%{transform:translateY(-6px)}}
+    .cm-window{flex:1;background:#f6f6f6;border:4px solid #000;box-shadow:8px 8px 0 #000;font-family:'Press Start 2P',monospace;image-rendering:pixelated}
+    .cm-bar{background:#000;height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+    .cm-dash{width:12px;height:4px;background:#fff}
+    .cm-x{color:#fff;font-size:12px;line-height:1;background:none;border:0;cursor:pointer;font-family:inherit}
+    .cm-body{padding:18px 16px 20px;text-align:center}
+    .cm-cookies{height:46px;margin:0 auto 12px;image-rendering:pixelated}
+    .cm-title{font-size:13px;line-height:1.55;color:#000;margin-bottom:10px}
+    .cm-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#475569;margin-bottom:16px;line-height:1.5}
+    .cm-yes{font-family:inherit;font-size:12px;padding:12px 28px;background:#5eead4;color:#000;border:3px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer}
+    .cm-yes:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000}
+    @media(max-width:480px){.cm-monster{width:96px;margin-right:-18px}.cm-title{font-size:10px}.cm-yes{font-size:10px;padding:10px 18px}}
+  </style>
+</head>
+<body class="min-h-screen text-slate-700 relative flex flex-col">
+
+  <!-- Background Video -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <video autoplay loop muted playsinline class="w-full h-full object-cover">
+      <source src="background.mp4" type="video/mp4">
+      Browser Anda tidak mendukung tag video.
+    </video>
+  </div>
+
+  <div id="app" class="relative z-10 flex flex-col min-h-screen">
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-40 glass-nav px-4 lg:px-8 py-3.5 transition-all duration-300">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <!-- Logo & Title -->
+        <div onclick="navigateTo('home')" class="flex items-center space-x-3 cursor-pointer group">
+          <div class="w-10 h-10 rounded-2xl glass-button flex items-center justify-center text-teal-600 shadow-sm group-hover:scale-105 transition-transform">
+            <img src="favicon1.png" alt="logo" class="w-7 h-7 object-contain">
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-600">16 personalities</span>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-2">
+          <button onclick="navigateTo('home')" id="nav-home" class="px-4 py-2 rounded-full text-sm font-semibold transition-all hover:bg-white/50 text-teal-700">
+            <span data-i18n="nav_home">Personality Test</span>
+          </button>
+          <div class="nav-item relative">
+            <button onclick="goToTypes()" id="nav-types" class="px-4 py-2 rounded-full text-sm font-semibold transition-all hover:bg-white/50 text-slate-600">
+              <span data-i18n="nav_types">Personality Types</span>
+            </button>
+            <div class="mega-menu" id="mega-menu"></div>
+          </div>
+          <button onclick="openContactModal()" class="px-4 py-2 rounded-full text-sm font-semibold transition-all hover:bg-white/50 text-slate-600 flex items-center gap-2">
+            <i class="fa-regular fa-comment-dots text-teal-500"></i>
+            <span data-i18n="nav_contact">Contact Us</span>
+          </button>
+        </nav>
+
+        <!-- Right Side Actions (Auth & Settings) -->
+        <div class="flex items-center space-x-3">
+          <div id="auth-buttons-container"></div>
+          <button onclick="toggleSettingsModal()" class="w-10 h-10 rounded-full glass-button flex items-center justify-center text-slate-600 hover:text-teal-600 transition-colors" data-i18n-title="settings_title" title="Pengaturan">
+            <i class="fa-solid fa-ellipsis text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-6">
+
+      <!-- ==================== HOME VIEW ==================== -->
+      <section id="view-home" class="max-w-7xl mx-auto space-y-16">
+        
+        <!-- HERO BANNER -->
+        <div class="relative rounded-3xl glass-bubble p-8 lg:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/80 shadow-lg">
+          <div class="flex-1 space-y-6 text-center md:text-left z-10">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-teal-100/80 text-teal-800 backdrop-blur-sm border border-teal-200">
+              <i class="fa-solid fa-sparkles"></i> <span data-i18n="badge">Akurat & Interaktif</span>
+            </span>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-800 leading-tight tracking-tight">
+              <span data-i18n="hero_title">What type of personality are you?</span>
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-sky-500 to-indigo-600" data-i18n="hero_subtitle">Explore your identity.</span>
+            </h1>
+            <p class="text-slate-600 text-base sm:text-lg max-w-xl font-normal leading-relaxed" data-i18n="hero_desc">
+              Pahami pandangan hidup, hubungan, karir, dan potensi diri Anda melalui tes kepribadian 16 tipe dengan estetika jernih dan tenang.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-4 justify-center md:justify-start">
+              <button onclick="startQuiz()" class="glass-button px-8 py-4 rounded-full text-slate-800 font-bold text-lg shadow-bubble hover:shadow-bubble-glow flex items-center gap-3 border border-white/90 group">
+                <span data-i18n="btn_take_test">Take your test</span>
+                <div class="w-8 h-8 rounded-full bg-teal-500/20 text-teal-700 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                  <i class="fa-solid fa-arrow-right text-sm"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 flex justify-center z-10 w-full max-w-md">
+            <div id="hero-character" class="reveal-left relative w-full max-w-md aspect-square flex items-center justify-center">
+              <img src="alltype.png" alt="16 tipe kepribadian" class="relative z-10 w-full h-full object-contain drop-shadow-2xl">
+              <div id="hero-tiles" class="hero-tiles"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DISCOVER YOUR JOURNEY SECTION -->
+        <div class="glass-bubble p-8 lg:p-10 rounded-3xl space-y-8 border border-white/80 shadow-lg">
+          <div class="text-center space-y-2">
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800" data-i18n="discover_title">Discover Your Journey</h2>
+            <p class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-medium" data-i18n="discover_subtitle">Tiga langkah sederhana menuju pemahaman diri yang lebih dalam.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="reveal-left bg-white/60 backdrop-blur-md p-6 rounded-2xl space-y-4 text-center hover:scale-[1.02] transition-transform border border-white/80 shadow-sm">
+              <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-teal-100 to-cyan-200 flex items-center justify-center text-teal-700 text-2xl shadow-inner border border-white">
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+              <h3 class="font-bold text-lg text-slate-800" data-i18n="card1_title">1. Jawab Pertanyaan</h3>
+              <p class="text-slate-600 text-sm leading-relaxed" data-i18n="card1_desc">Jawab dengan jujur sesuai gaya dan preferensi keseharian Anda tanpa tekanan.</p>
+            </div>
+
+            <div class="reveal-bottom bg-white/60 backdrop-blur-md p-6 rounded-2xl space-y-4 text-center hover:scale-[1.02] transition-transform border border-white/80 shadow-sm">
+              <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-sky-100 to-indigo-200 flex items-center justify-center text-indigo-700 text-2xl shadow-inner border border-white">
+                <i class="fa-solid fa-brain"></i>
+              </div>
+              <h3 class="font-bold text-lg text-slate-800" data-i18n="card2_title">2. Analisis MBTI</h3>
+              <p class="text-slate-600 text-sm leading-relaxed" data-i18n="card2_desc">Algoritma menghitung skala Introversion, Extraversion, Intuition, Sensing, dll.</p>
+            </div>
+
+            <div class="reveal-right bg-white/60 backdrop-blur-md p-6 rounded-2xl space-y-4 text-center hover:scale-[1.02] transition-transform border border-white/80 shadow-sm">
+              <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-purple-100 to-pink-200 flex items-center justify-center text-purple-700 text-2xl shadow-inner border border-white">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <h3 class="font-bold text-lg text-slate-800" data-i18n="card3_title">3. Simpan & Bandingkan</h3>
+              <p class="text-slate-600 text-sm leading-relaxed" data-i18n="card3_desc">Simpan hasil tes ke akun Anda dan pantau evolusi kepribadian dari tahun ke tahun.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FREE PERSONALITY TEST SECTION (YOUTUBE THUMBNAIL) -->
+        <div class="glass-bubble p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center border border-white/80 shadow-lg">
+          <div class="space-y-4">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-teal-600" data-i18n="about_tag">Tentang Tes Kepribadian</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 leading-snug" data-i18n="about_title">Free Personality Test: Kenapa Harus Mengikuti Tes Ini?</h2>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed" data-i18n="about_desc1">
+              Tes kepribadian MBTI membantu membuka wawasan tentang cara Anda mengambil keputusan, berinteraksi dengan orang lain, serta menangani tekanan harian.
+            </p>
+            <p class="text-slate-600 text-sm leading-relaxed" data-i18n="about_desc2">
+              Hanya membutuhkan waktu kurang dari 10 menit dengan tampilan jernih yang tenang. Hasil dapat disimpan permanen pada riwayat profil Anda.
+            </p>
+            <div class="pt-2">
+              <button onclick="startQuiz()" class="glass-button px-6 py-2.5 rounded-full text-slate-800 font-semibold text-sm border border-white flex items-center gap-2">
+                <i class="fa-solid fa-play text-teal-600"></i> <span data-i18n="btn_start_now">Mulai Tes Sekarang</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-center">
+            <a href="https://youtu.be/_BSjj1IZQJQ" target="_blank" rel="noopener noreferrer" class="w-full h-64 sm:h-72 rounded-2xl glass-bubble overflow-hidden border border-white p-2 relative group block shadow-md hover:shadow-xl transition-all">
+              <img src="https://img.youtube.com/vi/_BSjj1IZQJQ/hqdefault.jpg" 
+                   alt="YouTube Video Thumbnail" 
+                   class="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+                <div class="w-14 h-14 rounded-full bg-red-600 text-white flex items-center justify-center text-xl shadow-lg group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-play ml-1"></i>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== QUIZ VIEW ==================== -->
+      <section id="view-quiz" class="hidden max-w-3xl mx-auto space-y-8 py-4">
+        <div class="sticky top-20 z-30 glass-bubble p-4 sm:p-6 space-y-3 shadow-lg border border-white">
+          <div class="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-700">
+            <span id="quiz-progress-text">Pertanyaan 1 dari 60</span>
+            <span id="quiz-progress-percent" class="text-teal-600">0%</span>
+          </div>
+          <div class="w-full h-3 bg-white/60 rounded-full overflow-hidden p-0.5 border border-white">
+            <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-teal-400 via-sky-400 to-indigo-500 rounded-full transition-all duration-300 w-0"></div>
+          </div>
+        </div>
+
+        <div id="questions-list" class="space-y-12 py-6"></div>
+
+        <div id="quiz-footer-form" class="hidden glass-bubble p-6 sm:p-8 space-y-6 text-center border border-white">
+          <h3 class="text-2xl font-bold text-slate-800" data-i18n="form_title">Langkah Terakhir (Opsional)</h3>
+          <p class="text-sm text-slate-600" data-i18n="form_subtitle">Isi data di bawah ini jika ingin menyimpan ke riwayat personal Anda.</p>
+          
+          <div class="flex justify-center max-w-xs mx-auto text-center">
+            <div class="w-full">
+              <label class="block text-xs font-bold text-slate-600 mb-2" data-i18n="lbl_gender">Jenis Kelamin</label>
+              <select id="user-gender" class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-200 text-sm text-center focus:outline-none focus:ring-2 focus:ring-teal-400 shadow-sm cursor-pointer">
+                <option value="unspecified" data-i18n="gender_pick">Pilih (Opsional)</option>
+                <option value="male" data-i18n="g_male">Laki-laki</option>
+                <option value="female" data-i18n="g_female">Perempuan</option>
+                <option value="other" data-i18n="g_other">Lainnya</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="calculateResults()" class="glass-button px-10 py-3.5 rounded-full text-slate-800 font-bold text-lg shadow-bubble hover:shadow-bubble-glow bg-teal-500/20 hover:bg-teal-500/30 border border-teal-200">
+            <span data-i18n="btn_see_result">Lihat Hasil MBTI Saya</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== RESULT VIEW ==================== -->
+      <section id="view-result" class="hidden max-w-3xl mx-auto space-y-8 py-4">
+        <div class="glass-bubble p-8 sm:p-10 text-center space-y-6 border border-white">
+          <span class="inline-block px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest bg-teal-100 text-teal-800" data-i18n="result_badge">Hasil Tes Kepribadian Anda</span>
+          
+          <div onclick="goToTypeDetailFromResult()" class="group cursor-pointer p-4 rounded-3xl transition-all duration-300 hover:bg-white/40 hover:scale-[1.01] border border-transparent hover:border-white/60 shadow-sm hover:shadow-md" title="Klik untuk melihat detail tipe ini">
+            <div class="space-y-2">
+              <h1 id="result-mbti-type" class="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-sky-600 to-indigo-600 tracking-wider">INTJ</h1>
+              <h2 id="result-mbti-title" class="text-2xl font-bold text-slate-800">Sang Arsitek</h2>
+            </div>
+
+            <!-- BUBBLE CONTAINER GAMBAR TIPE MBTI -->
+            <div class="w-36 h-36 mx-auto rounded-3xl glass-bubble p-4 my-4 flex items-center justify-center border border-white shadow-inner group-hover:scale-105 transition-transform" style="overflow:visible">
+              <img id="result-mbti-image" src="" alt="MBTI Avatar" class="w-full h-full object-contain drop-shadow-md">
+            </div>
+
+            <p id="result-mbti-desc" class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+              Pemikir yang imajinatif dan strategis, dengan rencana untuk segala hal. Anda menyukai keteraturan, logika, dan penyelesaian masalah jangka panjang.
+            </p>
+            <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 group-hover:underline">
+              <span id="result-click-detail-text">Klik untuk melihat 8 kategori & detail lengkap tipe ini</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+
+          <p id="result-identity-desc" class="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto"></p>
+
+          <div id="result-traits-breakdown" class="space-y-4 text-left max-w-md mx-auto pt-4 border-t border-slate-200/60"></div>
+
+          <div class="pt-6 flex flex-wrap gap-4 justify-center">
+            <button onclick="downloadResult()" class="glass-button px-6 py-3 rounded-full text-indigo-800 font-bold text-sm flex items-center gap-2 border border-indigo-200">
+              <i class="fa-solid fa-download text-indigo-600"></i> <span id="share-btn-label">Download Hasil</span>
+            </button>
+            <button onclick="saveResultToProfile()" class="glass-button px-6 py-3 rounded-full text-teal-800 font-bold text-sm flex items-center gap-2 border border-teal-200">
+              <i class="fa-solid fa-bookmark text-teal-600"></i> <span data-i18n="btn_save_history">Simpan ke History Profil</span>
+            </button>
+            <button onclick="startQuiz()" class="glass-button px-6 py-3 rounded-full text-slate-700 font-semibold text-sm flex items-center gap-2">
+              <i class="fa-solid fa-rotate-right"></i> <span data-i18n="btn_retake">Ulangi Tes</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PERSONALITY TYPES VIEW ==================== -->
+      <section id="view-types" class="hidden max-w-7xl mx-auto space-y-8">
+        <div class="flex justify-center">
+          <div class="glass-bubble w-fit max-w-full px-8 sm:px-10 py-5 rounded-3xl text-center space-y-2 border border-white/80 shadow-lg">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800" data-i18n="types_title">16 Personality Types</h1>
+            <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto font-medium" data-i18n="types_subtitle">Jelajahi 16 profil kepribadian MBTI lengkap dengan karakteristik khas masing-masing.</p>
+          </div>
+        </div>
+
+        <div id="search-wrap" class="max-w-md mx-auto flex items-center gap-2 relative z-20">
+          <button id="type-search-back" onclick="searchBack()" class="w-11 h-11 shrink-0 rounded-full glass-button flex items-center justify-center text-slate-600 hover:text-teal-600 border border-white" title="Kembali">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute top-1/2 -translate-y-1/2 start-4 text-slate-400 pointer-events-none"></i>
+            <input id="type-search" autocomplete="off" oninput="filterTypes(); renderSearchHistory()" onfocus="renderSearchHistory()" onchange="shAdd(this.value)" onkeydown="searchKey(event)" class="w-full ps-11 pe-4 py-3 rounded-full bg-white/80 backdrop-blur-md border border-slate-200/80 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 shadow-sm" data-i18n-ph="search_ph">
+            <div id="search-history" class="hidden absolute top-full left-0 right-0 mt-2 rounded-2xl bg-white/95 backdrop-blur-md border border-white shadow-xl overflow-hidden text-sm"></div>
+          </div>
+        </div>
+
+        <div id="mbti-cards-grid" class="space-y-12"></div>
+      </section>
+
+      <!-- ==================== TYPE DETAIL ==================== -->
+      <section id="view-type" class="hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-6">
+        <div id="tp-hero" class="w-full"></div>
+        
+        <div id="tp-tabs-wrap" class="tp-tabs-wrap sticky top-16 z-30 shadow-md">
+          <div id="tp-tabs" class="tp-tabs" role="tablist"></div>
+          <div class="tp-bar"><i id="tp-bar-fill"></i></div>
+        </div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+          <div class="glass-bubble p-6 sm:p-10 rounded-3xl shadow-xl border border-white/90">
+            <article id="tp-content" class="tp-article text-slate-700 leading-relaxed"></article>
+            <div id="tp-pager" class="tp-pager mt-8 pt-6 border-t border-slate-200/60"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== DASHBOARD / HISTORY VIEW ==================== -->
+      <section id="view-history" class="hidden max-w-4xl mx-auto space-y-8">
+        <div class="glass-bubble p-8 space-y-6 border border-white">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200/60 pb-6">
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <div id="profile-avatar" class="w-16 h-16 rounded-full glass-bubble flex items-center justify-center text-teal-600 text-2xl font-bold border border-white overflow-hidden">
+                  <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <button onclick="document.getElementById('profile-photo-input').click()" id="profile-photo-btn" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-teal-600 text-white text-xs flex items-center justify-center border-2 border-white hover:bg-teal-700">
+                  <i class="fa-solid fa-camera"></i>
+                </button>
+                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="onProfilePhoto(this)">
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 id="profile-user-name" class="text-xl font-bold text-slate-800">Profil Pengguna</h2>
+                  <button onclick="startEditName()" id="profile-name-btn" class="text-slate-400 hover:text-teal-600"><i class="fa-solid fa-pen text-xs"></i></button>
+                </div>
+                <p id="profile-user-email" class="text-xs text-slate-500">user@example.com</p>
+                <div id="profile-name-edit" class="hidden mt-2 flex flex-wrap items-center gap-2">
+                  <input id="profile-name-input" maxlength="40" onkeydown="if(event.key==='Enter'){event.preventDefault();saveProfileName();}else if(event.key==='Escape'){cancelEditName();}" class="px-3 py-1.5 rounded-full text-sm border border-slate-200 bg-white/80 outline-none focus:border-teal-400">
+                  <button onclick="saveProfileName()" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-teal-600 text-white"><span data-i18n="p_save">Simpan</span></button>
+                  <button onclick="cancelEditName()" class="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-500 hover:bg-slate-100"><span data-i18n="p_cancel">Batal</span></button>
+                </div>
+                <button id="profile-photo-remove" onclick="removeProfilePhoto()" class="hidden mt-1 text-[11px] text-slate-400 hover:text-rose-500 underline"><span data-i18n="p_remove_photo">Hapus foto</span></button>
+              </div>
+            </div>
+            <button onclick="logoutUser()" class="px-4 py-2 rounded-full text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors">
+              <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> <span data-i18n="logout">Keluar</span>
+            </button>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 mb-4" data-i18n="history_title">Riwayat Tes Kepribadian</h3>
+            <div id="history-list-container" class="space-y-4"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER SIMPLE -->
+    <footer class="w-full mt-auto glass-nav border-t border-white/80 py-8 px-4 relative z-20">
+      <div class="max-w-xl mx-auto text-center space-y-4">
+        
+        <div class="space-y-1">
+          <h4 class="font-extrabold text-slate-800 text-sm sm:text-base" data-i18n="footer_rights">© 2026 Tes 16Personalities. Hak cipta dilindungi.</h4>
+          <p class="text-xs text-slate-600 font-medium" data-i18n="footer_desc">Dibuat untuk membantu mengenal kepribadian secara lebih akurat dan menyenangkan.</p>
+        </div>
+
+        <div class="flex items-center justify-center gap-4 pt-1">
+          <a href="https://instagram.com/sashaaksari" target="_blank" rel="noopener noreferrer" title="Instagram" class="w-11 h-11 rounded-full bg-white/80 flex items-center justify-center text-rose-500 hover:scale-110 transition-transform shadow-md border border-white">
+            <i class="fa-brands fa-instagram text-xl"></i>
+          </a>
+          <a href="https://wa.me/628881092822" target="_blank" rel="noopener noreferrer" title="WhatsApp" class="w-11 h-11 rounded-full bg-white/80 flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform shadow-md border border-white">
+            <i class="fa-brands fa-whatsapp text-xl"></i>
+          </a>
+          <a href="https://threads.net/@sashaaksari" target="_blank" rel="noopener noreferrer" title="Threads" class="w-11 h-11 rounded-full bg-white/80 flex items-center justify-center text-slate-900 hover:scale-110 transition-transform shadow-md border border-white">
+            <i class="fa-brands fa-threads text-xl"></i>
+          </a>
+          <button onclick="openQrModal()" title="Scan QR Web" class="w-11 h-11 rounded-full bg-white/80 flex items-center justify-center text-teal-600 hover:scale-110 transition-transform shadow-md border border-white">
+            <i class="fa-solid fa-qrcode text-xl"></i>
+          </button>
+        </div>
+
+      </div>
+    </footer>
+
+    <!-- FLOATING CONTACT BUTTON -->
+    <button onclick="openContactModal()" class="fixed bottom-6 right-6 z-40 glass-button w-14 h-14 rounded-full flex items-center justify-center text-teal-600 text-xl shadow-bubble hover:shadow-bubble-glow border border-white hover:scale-110 transition-all" data-i18n-title="nav_contact" title="Hubungi Kami">
+      <i class="fa-regular fa-paper-plane"></i>
+    </button>
+
+    <!-- MODALS -->
+    
+    <!-- QR CODE POPUP MODAL -->
+    <div id="modal-qr" class="fixed inset-0 z-50 bg-slate-900/30 backdrop-blur-md hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeQrModal()">
+      <div class="glass-bubble max-w-sm w-full p-8 text-center space-y-5 border border-white shadow-2xl relative">
+        <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex flex-col items-center gap-2">
+          <div class="w-10 h-10 rounded-2xl glass-button flex items-center justify-center text-teal-600 shadow-sm mb-1">
+            <img src="favicon1.png" alt="logo" class="w-7 h-7 object-contain">
+          </div>
+          <h3 class="font-extrabold text-2xl text-slate-800 tracking-tight">16Personalities</h3>
+          <p class="text-xs font-semibold text-slate-500">Scan QR code di bawah ini untuk membuka website</p>
+        </div>
+
+        <div class="flex justify-center bg-white rounded-3xl shadow-inner border border-slate-100" style="padding:20px">
+          <div id="qrcode-canvas"></div>
+        </div>
+
+        <div id="qr-warn" class="hidden text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 leading-relaxed text-left"></div>
+
+        <div class="flex items-center gap-2 bg-white/80 border border-white rounded-full pl-4 pr-1 py-1">
+          <span id="qr-url" class="flex-1 min-w-0 truncate text-xs text-slate-500 font-medium text-left"></span>
+          <button onclick="copySiteUrl()" id="qr-copy" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors">Salin</button>
+        </div>
+
+        <p class="text-xs text-slate-400 font-medium">Buka kamera HP Anda lalu arahkan ke gambar QR di atas.</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="modal-settings" class="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="glass-bubble max-w-sm w-full p-6 space-y-6 border border-white shadow-2xl animate-float">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="settings_title">Pengaturan</h3>
+          <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2" data-i18n="settings_lang">Pilih Bahasa / Language</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="setLanguage('id')" id="lang-btn-id" class="px-4 py-2.5 rounded-xl border font-semibold text-xs">🇮🇩 Indonesia</button>
+              <button onclick="setLanguage('en')" id="lang-btn-en" class="px-4 py-2.5 rounded-xl border font-semibold text-xs">🇬🇧 English</button>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="toggleSettingsModal()" class="w-full py-2.5 rounded-xl glass-button text-xs font-bold text-slate-700" data-i18n="close">Tutup</button>
+      </div>
+    </div>
+
+    <!-- CONTACT US MODAL -->
+    <div id="modal-contact" class="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="glass-bubble max-w-md w-full p-6 space-y-6 border border-white shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+            <i class="fa-regular fa-envelope text-teal-600"></i> <span data-i18n="nav_contact">Contact Us</span>
+          </h3>
+          <button onclick="closeContactModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <form onsubmit="handleContactSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="c_name">Nama</label>
+            <input type="text" required placeholder="Nama Anda" data-i18n-ph="c_name_ph" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="c_msg">Pesan</label>
+            <textarea required rows="3" placeholder="Tuliskan pesan atau masukan Anda..." data-i18n-ph="c_msg_ph" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"></textarea>
+          </div>
+          <button type="submit" class="w-full py-2.5 rounded-xl glass-button font-bold text-sm text-slate-800 bg-teal-500/20 border border-teal-300"><span data-i18n="c_send">Kirim Pesan</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="modal-auth" class="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="glass-bubble max-w-sm w-full p-6 space-y-6 border border-white shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 id="auth-modal-title" class="font-bold text-lg text-slate-800">Masuk Akun</h3>
+          <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div id="google-block" class="hidden space-y-3">
+          <button type="button" onclick="googleSignIn()" class="w-full py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 font-bold text-sm text-slate-700 flex items-center justify-center gap-2.5 transition">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+            <span id="google-label">Continue with Google</span>
+          </button>
+          <div class="flex items-center gap-3 text-[11px] font-semibold text-slate-400"><span class="flex-1 h-px bg-slate-200"></span><span id="google-or">atau</span><span class="flex-1 h-px bg-slate-200"></span></div>
+        </div>
+        <form onsubmit="handleAuthSubmit(event)" class="space-y-4" novalidate>
+          <div id="auth-hint" class="hidden text-xs font-semibold text-teal-800 bg-teal-50 border border-teal-200 rounded-xl px-3 py-2"></div>
+          <div id="auth-error" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2"></div>
+          <div id="auth-name-field" class="hidden">
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="a_fullname">Nama</label>
+            <input type="text" id="auth-name-input" autocomplete="name" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="a_email">Email</label>
+            <input type="email" id="auth-email-input" autocomplete="email" data-i18n-ph="email_ph" placeholder="nama@email.com" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="a_pass">Password</label>
+            <div class="relative">
+              <input type="password" id="auth-pass-input" autocomplete="current-password" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <button type="button" onclick="togglePass()" class="absolute inset-y-0 end-3 text-slate-400 hover:text-slate-600"><i class="fa-regular fa-eye" id="pass-eye"></i></button>
+            </div>
+          </div>
+          <div id="auth-pass2-field" class="hidden">
+            <label class="block text-xs font-bold text-slate-600 mb-1" data-i18n="a_pass2">Confirm</label>
+            <input type="password" id="auth-pass2-input" autocomplete="new-password" class="w-full px-4 py-2 rounded-xl bg-white/70 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+          </div>
+          <button type="submit" class="w-full py-2.5 rounded-xl glass-button font-bold text-sm text-slate-800 bg-teal-500/20 border border-teal-300"><span id="auth-btn-label">Masuk</span></button>
+        </form>
+
+        <div class="text-center">
+          <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs font-semibold text-teal-600 hover:underline">
+            Belum punya akun? Daftar di sini
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM TAB BAR (HP) -->
+  <nav id="mobile-tabbar" class="md:hidden fixed bottom-0 inset-x-0 z-40 glass-nav" style="border-bottom:0;border-top:1px solid rgba(255,255,255,.8);padding-bottom:env(safe-area-inset-bottom,0px)">
+    <div class="grid grid-cols-3 text-[11px] font-semibold">
+      <button id="m-home" onclick="navigateTo('home')" class="m-tab"><i class="fa-solid fa-clipboard-question"></i><span data-i18n="nav_home">Personality Test</span></button>
+      <button id="m-types" onclick="goToTypes()" class="m-tab"><i class="fa-solid fa-shapes"></i><span data-i18n="nav_types">Personality Types</span></button>
+      <button id="m-contact" onclick="openContactModal()" class="m-tab"><i class="fa-regular fa-comment-dots"></i><span data-i18n="nav_contact">Contact Us</span></button>
+    </div>
+  </nav>
+
+  <script>
+    // ===== ISI setelah web kamu online, contoh: 'https://namakamu.github.io/mbti-personality/' =====
+    // Kalau dikosongkan, otomatis memakai alamat halaman yang sedang dibuka.
+    const SITE_URL = '';
+
+    function getSiteUrl() {
+      if (SITE_URL) return SITE_URL;
+      if (location.protocol === 'file:') return location.href;
+      return location.origin + location.pathname.replace(/index\.html$/i, '');
+    }
+    function isLocalOnly(u) {
+      return location.protocol === 'file:' || /^https?:\/\/(localhost|127\.|0\.0\.0\.0)/i.test(u);
+    }
+
+    function openQrModal() {
+      const url = getSiteUrl();
+      document.getElementById('modal-qr').classList.remove('hidden');
+
+      const box = document.getElementById('qrcode-canvas');
+      box.innerHTML = '';
+      new QRCode(box, {
+        text: url,
+        width: 220,
+        height: 220,
+        colorDark: '#0f172a',   // gelap pekat supaya mudah terbaca kamera
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById('qr-url').textContent = url;
+      const warn = document.getElementById('qr-warn');
+      if (isLocalOnly(url)) {
+        warn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Alamat ini (localhost) hanya bisa dibuka di komputermu sendiri, jadi HP lain tidak bisa membukanya lewat QR. Upload web ke hosting dulu, lalu isi <b>SITE_URL</b> di index.html.';
+        warn.classList.remove('hidden');
+      } else {
+        warn.classList.add('hidden');
+      }
+    }
+
+    function copySiteUrl() {
+      const btn = document.getElementById('qr-copy'), url = getSiteUrl();
+      const done = () => { btn.textContent = 'Tersalin!'; setTimeout(() => (btn.textContent = 'Salin'), 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(done).catch(done); else done();
+    }
+
+    function closeQrModal() {
+      document.getElementById('modal-qr').classList.add('hidden');
+    }
+  </script>
+
+  <!-- POPUP SELAMAT DATANG (gaya "Accept all cookies") -->
+  <div id="cookie-pop" class="cm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+    <div class="cm-wrap">
+      <img class="cm-monster" src="cookie-monster.png" alt="">
+      <div class="cm-window">
+        <div class="cm-bar"><span class="cm-dash"></span><button class="cm-x" onclick="closeCookiePop()" aria-label="Tutup">&#10005;</button></div>
+        <div class="cm-body">
+          <img class="cm-cookies" src="cookie-trio.png" alt="">
+          <h2 id="cm-title" class="cm-title"></h2>
+          <p id="cm-sub" class="cm-sub"></p>
+          <button id="cm-yes" class="cm-yes" onclick="closeCookiePop()"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Atur foto profil -->
+  <div id="photo-crop-modal" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" style="z-index:9999">
+    <div class="bg-white/95 rounded-3xl p-5 w-full max-w-xs space-y-4 border border-white shadow-2xl">
+      <h3 class="font-bold text-slate-800 text-center" data-i18n="p_crop_title">Atur foto profil</h3>
+      <div class="relative mx-auto overflow-hidden rounded-2xl bg-white" style="width:240px;height:240px">
+        <canvas id="photo-crop-canvas" width="240" height="240" class="block touch-none cursor-grab" style="width:240px;height:240px"></canvas>
+        <div class="absolute inset-0 rounded-full pointer-events-none border-2 border-white/90" style="box-shadow:0 0 0 999px rgba(15,23,42,.5)"></div>
+      </div>
+      <div class="flex items-center gap-2 text-slate-400">
+        <i class="fa-regular fa-image text-xs"></i>
+        <input type="range" id="photo-zoom" min="1" max="5" step="0.01" value="1" class="w-full accent-teal-600">
+        <i class="fa-regular fa-image text-base"></i>
+      </div>
+      <p class="text-[11px] text-slate-500 text-center" data-i18n="p_crop_hint">Geser dan zoom untuk memilih bagian yang mau dipakai.</p>
+      <div class="flex gap-2 justify-end">
+        <button onclick="closePhotoCrop()" class="px-4 py-2 rounded-full text-xs font-semibold text-slate-500 hover:bg-slate-100"><span data-i18n="p_cancel">Batal</span></button>
+        <button onclick="confirmPhotoCrop()" class="px-4 py-2 rounded-full text-xs font-semibold bg-teal-600 text-white hover:bg-teal-700"><span data-i18n="p_save">Simpan</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lihat foto profil penuh -->
+  <div id="photo-viewer" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm cursor-zoom-out" style="z-index:9999" onclick="closePhotoViewer()">
+    <button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closePhotoViewer()"><i class="fa-solid fa-xmark"></i></button>
+    <img id="photo-viewer-img" src="" alt="" class="max-w-full max-h-full rounded-2xl shadow-2xl object-contain" onclick="event.stopPropagation()">
+  </div>
+
+  <script src="types-data.js"></script>
+  <script src="types-id-INTJ.js"></script>
+  <script src="types-id-INTP.js"></script>
+  <script src="types-id-ENTP.js"></script>
+  <script src="types-id-INFJ.js"></script>
+  <script src="types-id-INFP.js"></script>
+  <script src="types-id-part1.js"></script>
+  <script src="types-id-part2.js"></script>
+  <script src="types-id-part3.js"></script>
+  <script src="types-id-part4.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
